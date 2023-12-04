@@ -27,7 +27,7 @@ def upload():
     Endpoint for uploading an image to AWS given its base64 form,
     then storing/returning the URL of that image
     """
-    body = json.loads
+    body = json.loads(request.data)
     image_data= body.get("image_data")
     if image_data is None:
         failure_response("No base64 image fonud!")
@@ -55,7 +55,6 @@ def create_day():
     return success_response(new_day.serialize(), 201)
 
 
-
 @app.route("/day/posts/", methods=["POST"])
 def create_post():
 
@@ -63,11 +62,11 @@ def create_post():
     location=body.get("location")
     rating=body.get("rating")
     text=body.get("text")
-    pic=body.get("pic")
-    date_str = body.get("date")
+    pic_url=body.get("pic")
+    date_str=body.get("date_str")
 
 
-    if date_str is None or body is None or location is None or rating is None or text is None or pic is None:
+    if date_str is None or body is None or location is None or rating is None or text is None or pic_url is None:
         return failure_response("Invalid response body!", 400)
     
     day = Day.query.filter_by(date=date_str).first()
@@ -78,17 +77,18 @@ def create_post():
 
 
     post = Post(
-        body=body,
         location=location,
         rating=rating,
         text=text,
         day_id=day.id,
-        pic=pic
+        pic=pic_url
     )
 
     no_days = Day.query.count() + 1
+    print(no_days)
     new_rating = (day.overall_rating + rating) / no_days
-    Day.update_rating(new_rating)
+    print(new_rating)
+    day.update_rating(new_rating)
 
     db.session.add(post)
     db.session.commit()
@@ -106,16 +106,23 @@ def get_post_by_id(user_id):
     return success_response(post.serialize())
 
 
-#Get posts by day...
-@app.route("/posts/<int:day_id>/")
+@app.route("/posts/day/<int:day_id>/")
 def get_post_by_day(day_id):
     """
     Get posts by day
     """
-    posts = Post.query.filter_by(id=day_id)
+    day = Day.query.filter_by(id=day_id).first()
+    if day is None:
+        return failure_response("Invalid day was provided!")
+    
+    day_json = day.serialize()
+    posts = day_json.get("posts")
+
     if posts is None:
-        return failure_response("Post not found!")
-    return success_response(p.serialize() for p in posts)
+        return failure_response("No posts!", 400)
+
+    return success_response(posts)
+
 
 @app.route("/posts/<int:id>/", methods=["DELETE"])
 def delete_post(id):
@@ -128,10 +135,6 @@ def delete_post(id):
     db.session.delete(post)
     db.session.commit()
     return success_response(post.serialize())
-
-#images
-#api routes
-#add datetime property
 
 
 

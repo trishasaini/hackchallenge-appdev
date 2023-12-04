@@ -10,13 +10,14 @@ from PIL import Image
 import random
 import re
 import string
+from dotenv import load_dotenv
 
 db = SQLAlchemy()
 
 EXTENSIONS = ["png", "gif", "jpeg", "jpg"]
 BASE_DIR = os.getcwd()
 S3_BUCKET_NAME = os.environ.get("S3_BUCKET_NAME")
-S3_BASE_URL = f"https://{S3_BUCKET_NAME}.s3.us-east-1.amazonaws.com"
+S3_BASE_URL = f"https://{S3_BUCKET_NAME}.s3.us-east-2.amazonaws.com"
 
 class Asset(db.Model):
     """
@@ -99,7 +100,7 @@ class Asset(db.Model):
             s3_client = boto3.client("s3")
             s3_client.upload_file(img_temp_loc, S3_BUCKET_NAME, img_filename)
 
-            s3_resource = boto3.resource("s3")
+            s3_resource = boto3.resource('s3')
             object_acl = s3_resource.ObjectAcl(S3_BUCKET_NAME, img_filename)
             object_acl.put(ACL = "public-read")
 
@@ -107,7 +108,7 @@ class Asset(db.Model):
             os.remove(img_temp_loc)
 
         except Exception as e:
-            print("Error when uploading image: {e}")
+            print(f"Error when uploading image: {e}")
     
 
 
@@ -154,7 +155,7 @@ class Post(db.Model):
     rating = db.Column(db.Integer, nullable=False)
     text = db.Column(db.String)
     day_id = db.Column(db.Integer, db.ForeignKey("day.id"), nullable=False)
-    pic = db.Column(db.LargeBinary, nullable=False)
+    pic = db.Column(db.String, nullable=False)
     
     def __init__(self, **kwargs):
         """
@@ -165,6 +166,7 @@ class Post(db.Model):
         self.text = kwargs.get("text", "")
         self.day_id = kwargs.get("day_id")
         self.pic = kwargs.get("pic")
+        #date
 
     def serialize(self):
          """
