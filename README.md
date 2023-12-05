@@ -25,7 +25,7 @@ Backend:
 
 There are two tables in the database: a Day table of all the days and a Post table of all the posts. The relationship between them is one to many, with one day relating to many posts.
 
-Has been deployed on Google Cloud at link: 
+Has been deployed on Google Cloud at link: http://34.86.124.11/
 
 Anything else you want your grader to know
 Note: The link, screenshots, and description will be used for the Hack Challenge website where we will showcase everyone’s final projects
