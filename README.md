@@ -29,4 +29,5 @@ Has been deployed on Google Cloud at link: http://34.86.124.11/
 
 Anything else you want your grader to know
 Note: The link, screenshots, and description will be used for the Hack Challenge website where we will showcase everyone’s final projects
+
 Backend was submitted separately from frontend and design as these two parts of the team got an extension. They will link their work to our later. 
